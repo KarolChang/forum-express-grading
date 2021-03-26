@@ -1,6 +1,6 @@
-const { rawListeners } = require('../app')
 const db = require('../models')
 const Restaurant = db.Restaurant
+const fs = require('fs')
 
 const adminController = {
   // 瀏覽餐廳總表
@@ -19,11 +19,25 @@ const adminController = {
       req.flash('error_msg', 'name是必填項目!')
       return res.redirect('back')
     }
-    return Restaurant.create({ name, tel, address, opening_hours, description })
-      .then(() => {
-        req.flash('success_msg', '餐廳新增成功!')
-        res.redirect('/admin/restaurants')
+    const { file } = req
+    if (file) {
+      fs.readFile(file.path, (err, data) => {
+        if (err) console.log('Error: ', err)
+        fs.writeFile(`upload/${file.originalname}`, data, () => {
+          return Restaurant.create({ name, tel, address, opening_hours, description, image: file ? `/upload/${file.originalname}` : null })
+            .then(() => {
+              req.flash('success_msg', '餐廳新增成功!')
+              res.redirect('/admin/restaurants')
+            })
+        })
       })
+    } else {
+      return Restaurant.create({ name, tel, address, opening_hours, description, image: null })
+        .then(() => {
+          req.flash('success_msg', '餐廳新增成功!')
+          res.redirect('/admin/restaurants')
+        })
+    }
   },
   // 瀏覽一筆餐廳資料
   getRestaurant: (req, res) => {
@@ -44,13 +58,29 @@ const adminController = {
       req.flash('error_msg', 'name是必填項目!')
       return res.redirect('back')
     }
-    return Restaurant.findByPk(req.params.id, { raw: true }).then(restaurant => {
-      restaurant.update({ name, tel, address, opening_hours, description })
-        .then(() => {
-          req.flash('success_msg', '餐廳編輯成功!')
-          res.redirect('/admin/restaurants')
+    const { file } = req
+    if (file) {
+      fs.readFile(file.path, (err, data) => {
+        if (err) console.log('Error: ', err)
+        fs.writeFile(`/upload/${file.originalname}`, data, () => {
+          return Restaurant.findByPk(req.params.id).then(restaurant => {
+            restaurant.update({ name, tel, address, opening_hours, description, image: file ? `/upload/${file.originalname}` : restaurant.image })
+          })
+            .then(() => {
+              req.flash('success_msg', '餐廳編輯成功!')
+              res.redirect('/admin/restaurants')
+            })
         })
-    })
+      })
+    } else {
+      return Restaurant.findByPk(req.params.id, { raw: true }).then(restaurant => {
+        restaurant.update({ name, tel, address, opening_hours, description })
+          .then(() => {
+            req.flash('success_msg', '餐廳編輯成功!')
+            res.redirect('/admin/restaurants')
+          })
+      })
+    }
   },
   // 刪除一筆餐廳資料(delete)
   deleteRestaurant: (req, res) => {
