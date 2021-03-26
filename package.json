@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/v123582/forum-express-workspace#readme",
   "dependencies": {
+    "@handlebars/allow-prototype-access": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
