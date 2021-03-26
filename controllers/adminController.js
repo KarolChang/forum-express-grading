@@ -37,7 +37,7 @@ const adminController = {
       return res.render('admin/create', { restaurant })
     })
   },
-  // 編輯一筆餐廳資料(post)
+  // 編輯一筆餐廳資料(put)
   putRestaurant: (req, res) => {
     const { name, tel, address, opening_hours, description } = req.body
     if (!name) {
@@ -51,8 +51,14 @@ const adminController = {
           res.redirect('/admin/restaurants')
         })
     })
+  },
+  // 刪除一筆餐廳資料(delete)
+  deleteRestaurant: (req, res) => {
+    return Restaurant.findByPk(req.params.id).then(restaurant => {
+      restaurant.destroy()
+    })
+      .then(() => res.redirect('/admin/restaurants'))
   }
-
 }
 
 module.exports = adminController
