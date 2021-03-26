@@ -16,7 +16,7 @@ module.exports = (app, passport) => {
   app.get('/', authenticated, (req, res) => res.redirect('/restaurants'))
   app.get('/restaurants', authenticated, restController.getRestaurants)
   // 後台
-  app.get('/', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))
+  app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))
   app.get('/admin/restaurants', authenticatedAdmin, adminController.getRestaurants)
   // 註冊
   app.get('/signup', userController.signUpPage)
