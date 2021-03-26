@@ -1,11 +1,14 @@
 const bcrypt = require('bcryptjs')
+const passport = require('passport')
 const db = require('../models')
 const User = db.User
 
 const userController = {
+  // signup page
   signUpPage: (req, res) => {
     return res.render('signup')
   },
+  // signup feature
   signUp: (req, res) => {
     const { name, email, password, passwordCheck } = req.body
     if (password !== passwordCheck) {
@@ -31,6 +34,21 @@ const userController = {
           }
         })
     }
+  },
+  // signIn page
+  signInPage: (req, res) => {
+    return res.render('signin')
+  },
+  // signIn feature
+  signIn: (req, res) => {
+    req.flash('success_msg', '成功登入!')
+    return res.redirect('/restaurants')
+  },
+  // logout
+  logout: (req, res) => {
+    req.flash('success_msg', '成功登出!')
+    req.logout()
+    res.redirect('/signin')
   }
 }
 
