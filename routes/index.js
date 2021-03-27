@@ -5,14 +5,16 @@ const userController = require('../controllers/userController')
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
 
+const helpers = require('../_helpers')
+
 module.exports = (app, passport) => {
   // 身分驗證
   const authenticated = (req, res, next) => {
-    if (req.isAuthenticated()) return next()
+    if (helpers.ensureAuthenticated(req)) return next()
     return res.redirect('/signin')
   }
   const authenticatedAdmin = (req, res, next) => {
-    if (req.isAuthenticated() && req.user.isAdmin) return next()
+    if (helpers.ensureAuthenticated(req) && helpers.getUser(req).isAdmin) return next()
     return res.redirect('/')
   }
   // 前台
