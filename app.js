@@ -4,7 +4,12 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const flash = require('connect-flash')
 const methodOverride = require('method-override')
+// dotenv 加在 passport 之前
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 const passport = require('./config/passport')
+
 
 const db = require('./models')
 const app = express()
