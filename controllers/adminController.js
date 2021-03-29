@@ -1,5 +1,6 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
+const User = db.User
 const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
@@ -86,6 +87,26 @@ const adminController = {
       restaurant.destroy()
     })
       .then(() => res.redirect('/admin/restaurants'))
+  },
+  // 瀏覽使用者列表
+  getUsers: (req, res) => {
+    return User.findAll({ raw: true })
+      .then(users => { return res.render('admin/users', { users }) })
+  },
+  // 修改使用者權限
+  toggleAdmin: (req, res) => {
+    return User.findByPk(req.params.id).then(user => {
+      if (user.isAdmin) {
+        user.isAdmin = false
+      } else {
+        user.isAdmin = true
+      }
+      return user.save()
+    })
+      .then(user => {
+        req.flash('success_msg', `${user.name}已成功修改權限至: ${Object.keys(req.body)}!`)
+        return res.redirect('/admin/users')
+      })
   }
 }
 

@@ -15,7 +15,12 @@ const db = require('./models')
 const app = express()
 const port = process.env.PORT || 3000
 
-app.engine('hbs', exphbs({ extname: '.hbs'}))
+app.engine('hbs', exphbs({
+  extname: '.hbs'
+  // helpers: {
+  //   eq: function (a, b) { return a === b }
+  // }
+}))
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({ secret: 'MySecret', resave: false, saveUninitialized: false }))
