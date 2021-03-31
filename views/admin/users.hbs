@@ -1,5 +1,4 @@
 <h1>餐廳後台</h1>
-
 <div id="switch">
   <a href="/admin/restaurants">Restaurants</a> |
   <a href="/admin/users/">Users</a>
@@ -25,12 +24,17 @@
       <td>{{this.name}}</td>
       <td>{{this.email}}</td>
       {{#if this.isAdmin}}
+      {{#if (eq this.loginId this.id)}}
+      <td>admin</td>
+      <td style="color:red;font-weight:700;">Cannot change authority by yourself!</td>
+      {{else}}
       <td>admin</td>
       <td>
         <form action="/admin/users/{{this.id}}/toggleAdmin?_method=PUT" method="POST">
           <button type="submit" class="btn btn-success">set as user</button>
         </form>
       </td>
+      {{/if}}
       {{else}}
       <td>user</td>
       <td>

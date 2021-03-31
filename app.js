@@ -16,10 +16,10 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.engine('hbs', exphbs({
-  extname: '.hbs'
-  // helpers: {
-  //   eq: function (a, b) { return a === b }
-  // }
+  extname: '.hbs',
+  helpers: {
+    eq: function (a, b) { return a === b }
+  }
 }))
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg')
   res.locals.error_msg = req.flash('error_msg')
   res.locals.user = req.user
-  next()
+  return next()
 })
 
 app.listen(port, () => {

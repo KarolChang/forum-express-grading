@@ -1,7 +1,7 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
 const User = db.User
-const fs = require('fs')
+// const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
@@ -10,6 +10,7 @@ const adminController = {
   getRestaurants: (req, res) => {
     return Restaurant.findAll({ raw: true, nest: true })
       .then(restaurants => { return res.render('admin/restaurants', { restaurants }) })
+      .catch(err => console.log(err))
   },
   // 新增一筆餐廳資料(get)
   createRestaurant: (req, res) => {
@@ -26,11 +27,13 @@ const adminController = {
     if (file) {
       imgur.setClientID(IMGUR_CLIENT_ID)
       imgur.upload(file.path, (err, img) => {
+        if (err) console.log(err)
         return Restaurant.create({ name, tel, address, opening_hours, description, image: file ? img.data.link : null })
           .then(() => {
             req.flash('success_messages', 'restaurant was successfully created')
             return res.redirect('/admin/restaurants')
           })
+          .catch(err => console.log(err))
       })
     } else {
       return Restaurant.create({ name, tel, address, opening_hours, description, image: null })
@@ -38,6 +41,7 @@ const adminController = {
           req.flash('success_messages', 'restaurant was successfully created')
           return res.redirect('/admin/restaurants')
         })
+        .catch(err => console.log(err))
     }
   },
   // 瀏覽一筆餐廳資料
@@ -45,12 +49,14 @@ const adminController = {
     return Restaurant.findByPk(req.params.id).then(restaurant => {
       return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
     })
+      .catch(err => console.log(err))
   },
   // 編輯一筆餐廳資料(get)
   editRestaurant: (req, res) => {
     return Restaurant.findByPk(req.params.id, { raw: true }).then(restaurant => {
       return res.render('admin/create', { restaurant })
     })
+      .catch(err => console.log(err))
   },
   // 編輯一筆餐廳資料(put)
   putRestaurant: (req, res) => {
@@ -63,6 +69,7 @@ const adminController = {
     if (file) {
       imgur.setClientID(IMGUR_CLIENT_ID)
       imgur.upload(file.path, (err, img) => {
+        if (err) console.log(err)
         return Restaurant.findByPk(req.params.id).then(restaurant => {
           restaurant.update({ name, tel, address, opening_hours, description, image: file ? img.data.link : restaurant.image })
         })
@@ -70,6 +77,7 @@ const adminController = {
             req.flash('success_msg', '餐廳編輯成功!')
             res.redirect('/admin/restaurants')
           })
+          .catch(err => console.log(err))
       })
     } else {
       return Restaurant.findByPk(req.params.id).then(restaurant => {
@@ -78,6 +86,7 @@ const adminController = {
             req.flash('success_msg', '餐廳編輯成功!')
             return res.redirect('/admin/restaurants')
           })
+          .catch(err => console.log(err))
       })
     }
   },
@@ -87,11 +96,16 @@ const adminController = {
       restaurant.destroy()
     })
       .then(() => res.redirect('/admin/restaurants'))
+      .catch(err => console.log(err))
   },
   // 瀏覽使用者列表
   getUsers: (req, res) => {
     return User.findAll({ raw: true })
-      .then(users => { return res.render('admin/users', { users }) })
+      .then(users => {
+        users.forEach(user => { user.loginId = req.user.id })
+        return res.render('admin/users', { users })
+      })
+      .catch(err => console.log(err))
   },
   // 修改使用者權限
   toggleAdmin: (req, res) => {
@@ -104,9 +118,11 @@ const adminController = {
       return user.save()
     })
       .then(user => {
-        req.flash('success_msg', `${user.name}已成功修改權限至: ${Object.keys(req.body)}!`)
+        const authority = user.isAdmin ? 'admin' : 'user'
+        req.flash('success_msg', `${user.name}已成功修改權限至: ${authority}!`)
         return res.redirect('/admin/users')
       })
+      .catch(err => console.log(err))
   }
 }
 
