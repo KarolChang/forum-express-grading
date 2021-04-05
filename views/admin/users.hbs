@@ -24,7 +24,7 @@
       <td>{{this.name}}</td>
       <td>{{this.email}}</td>
       {{#if this.isAdmin}}
-      {{#if (eq this.loginId this.id)}}
+      {{#if (eq ../user.id this.id)}}
       <td>admin</td>
       <td style="color:red;font-weight:700;">Cannot change authority by yourself!</td>
       {{else}}

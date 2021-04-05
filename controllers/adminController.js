@@ -102,13 +102,12 @@ const adminController = {
   getUsers: (req, res) => {
     return User.findAll({ raw: true })
       .then(users => {
-        users.forEach(user => { user.loginId = req.user.id })
         return res.render('admin/users', { users })
       })
       .catch(err => console.log(err))
   },
   // 修改使用者權限
-  toggleAdmin: (req, res) => {
+  toggleAdmin: (req, res, next) => {
     return User.findByPk(req.params.id).then(user => {
       if (user.isAdmin) {
         user.isAdmin = false
