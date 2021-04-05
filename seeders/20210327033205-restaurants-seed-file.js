@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const faker = require('faker')
 
@@ -12,12 +12,13 @@ module.exports = {
       image: `https://loremflickr.com/320/240/restaurant,food/?random=${Math.random() * 100}`,
       description: faker.lorem.text(),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      CategoryId: Math.floor(Math.random() * 6) * 10 + 1
     }))
-    , {});
+    , {})
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('Restaurants', null, {});
+    await queryInterface.bulkDelete('Restaurants', null, {})
   }
-};
+}
