@@ -134,19 +134,47 @@ const adminController = {
   },
   // 瀏覽類別列表
   getCategories: async (req, res) => {
-    const categories = await Category.findAll({ raw: true, nest: true })
-    return res.render('admin/categories', { categories })
+    try {  
+      const categories = await Category.findAll({ raw: true, nest: true })
+      if (req.params.id) {
+        const category = await Category.findByPk(req.params.id)
+        return res.render('admin/categories', { category: category.toJSON(), categories })
+      }
+      return res.render('admin/categories', { categories })
+    } catch (err) {
+      console.warn(err)
+    }
   },
   // 新增分類
   postCategories: async (req, res) => {
-    const name = req.body.name.trim()
-    if (!name) {
-      req.flash('error_msg', 'name didn\'t exist')
-      return res.redirect('back')
+    try {
+      const name = req.body.name.trim()
+      if (!name) {
+        req.flash('error_msg', 'name didn\'t exist')
+        return res.redirect('back')
+      }
+      await Category.create({ name })
+      req.flash('success_msg', `成功新增 "${name}" 類別`)
+      return res.redirect('/admin/categories')
+    } catch (err) {
+      console.warn(err)
     }
-    await Category.create({ name })
-    req.flash('success_msg', `成功新增 "${name}" 類別`)
-    return res.redirect('/admin/categories')
+  },
+  // 編輯分類
+  putCategory: async (req, res) => {
+    try {
+      const name = req.body.name
+      if (!name) {
+        req.flash('error_msg', 'name didn\'t exist')
+        return res.redirect('back')
+      }
+      const category = await Category.findByPk(req.params.id)
+      category.update(req.body)
+      req.flash('success_msg', `成功修改 "${name}" 類別`)
+      return res.redirect('/admin/categories')
+    } catch (err) {
+      console.warn(err)
+    }
   }
 }
 

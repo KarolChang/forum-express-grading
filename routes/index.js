@@ -36,6 +36,8 @@ module.exports = (app, passport) => {
   // 後台 :類別
   app.get('/admin/categories', authenticatedAdmin, adminController.getCategories)
   app.post('/admin/categories', authenticatedAdmin, adminController.postCategories)
+  app.get('/admin/categories/:id', authenticatedAdmin, adminController.getCategories)
+  app.put('/admin/categories/:id', authenticatedAdmin, adminController.putCategory)
   // 註冊
   app.get('/signup', userController.signUpPage)
   app.post('/signup', userController.signUp)
