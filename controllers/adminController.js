@@ -136,6 +136,17 @@ const adminController = {
   getCategories: async (req, res) => {
     const categories = await Category.findAll({ raw: true, nest: true })
     return res.render('admin/categories', { categories })
+  },
+  // 新增分類
+  postCategories: async (req, res) => {
+    const name = req.body.name.trim()
+    if (!name) {
+      req.flash('error_msg', 'name didn\'t exist')
+      return res.redirect('back')
+    }
+    await Category.create({ name })
+    req.flash('success_msg', `成功新增 "${name}" 類別`)
+    return res.redirect('/admin/categories')
   }
 }
 
