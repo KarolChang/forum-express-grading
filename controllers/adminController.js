@@ -175,6 +175,16 @@ const adminController = {
     } catch (err) {
       console.warn(err)
     }
+  },
+  // 刪除分類
+  deleteCategory: async (req, res) => {
+    try {
+      const category = await Category.findByPk(req.params.id)
+      await category.destroy()
+      return res.redirect('/admin/categories')
+    } catch (err) {
+      console.warn(err)
+    }
   }
 }
 

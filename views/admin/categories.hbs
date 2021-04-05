@@ -45,10 +45,17 @@
           </a>
         </button>
         <form action="/admin/categories/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
-          <button type="submit" class="btn btn-link">Delete</button>
+          <button type="submit" class="btn btn-link" onclick="return deleteCheck()">Delete</button>
         </form>
       </td>
     </tr>
     {{/each}}
   </tbody>
 </table>
+
+<script>
+  function deleteCheck() {
+    const result = confirm('確定刪除?') ? true : false
+    return result
+  }
+</script>
