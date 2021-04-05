@@ -17,9 +17,7 @@ const port = process.env.PORT || 3000
 
 app.engine('hbs', exphbs({
   extname: '.hbs',
-  helpers: {
-    eq: function (a, b) { return a === b }
-  }
+  helpers: require('./config/hbs-helpers')
 }))
 app.set('view engine', 'hbs')
 app.use(bodyParser.urlencoded({ extended: true }))

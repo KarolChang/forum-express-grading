@@ -1,7 +1,9 @@
 <h1>餐廳後台</h1>
+
 <div id="switch">
   <a href="/admin/restaurants">Restaurants</a> |
-  <a href="/admin/users/">Users</a>
+  <a href="/admin/categories">Categories</a> |
+  <a href="/admin/users">Users</a>
 </div>
 
 <br />
@@ -24,7 +26,7 @@
       <td>{{this.name}}</td>
       <td>{{this.email}}</td>
       {{#if this.isAdmin}}
-      {{#if (eq ../user.id this.id)}}
+      {{#ifCond ../user.id this.id}}
       <td>admin</td>
       <td style="color:red;font-weight:700;">Cannot change authority by yourself!</td>
       {{else}}
@@ -34,7 +36,7 @@
           <button type="submit" class="btn btn-success">set as user</button>
         </form>
       </td>
-      {{/if}}
+      {{/ifCond}}
       {{else}}
       <td>user</td>
       <td>

@@ -116,7 +116,7 @@ const adminController = {
       .catch(err => console.log(err))
   },
   // 修改使用者權限
-  toggleAdmin: (req, res, next) => {
+  toggleAdmin: (req, res) => {
     return User.findByPk(req.params.id).then(user => {
       if (user.isAdmin) {
         user.isAdmin = false
@@ -131,6 +131,11 @@ const adminController = {
         return res.redirect('/admin/users')
       })
       .catch(err => console.log(err))
+  },
+  // 瀏覽類別列表
+  getCategories: async (req, res) => {
+    const categories = await Category.findAll({ raw: true, nest: true })
+    return res.render('admin/categories', { categories })
   }
 }
 
