@@ -1,7 +1,10 @@
 const bcrypt = require('bcryptjs')
-const passport = require('passport')
 const db = require('../models')
 const User = db.User
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+const helpers = require('../_helpers')
+const defaultImg = 'https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809'
 
 const userController = {
   // signup page
@@ -49,6 +52,71 @@ const userController = {
     req.flash('success_msg', '成功登出!')
     req.logout()
     res.redirect('/signin')
+  },
+  // 瀏覽 Profile
+  getUser: async (req, res) => {
+    try {
+      const id = Number(req.params.id)
+      const userId = helpers.getUser(req).id
+      // 跳轉至 profile 頁面
+      // if (id !== userId) return res.redirect(`/users/${id}`)
+      const user = await User.findByPk(id)
+      return res.render('user', { userNow: user.toJSON(), id, userId })
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+  // 瀏覽編輯 Profile 頁面
+  editUser: async (req, res) => {
+    try {
+      const id = Number(req.params.id)
+      const userId = helpers.getUser(req).id
+      // 強制跳轉至 profile 頁面
+      if (id !== userId) return res.redirect(`/users/${id}`)
+      const user = await User.findByPk(userId)
+      return res.render('editProfile', { user: user.toJSON() })
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+  // 編輯 Profile
+  putUser: async (req, res) => {
+    const id = Number(req.params.id)
+    const userId = helpers.getUser(req).id
+    // 強制跳轉至 profile 頁面
+    if (userId !== id) {
+      return res.redirect(`/users/${id}`)
+    }
+    const { file } = req
+    if (file) {
+      imgur.setClientID(IMGUR_CLIENT_ID)
+      imgur.upload(file.path, async (err, img) => {
+        try {
+          if (err) console.log(err)
+          const user = await User.findByPk(userId)
+          await user.update({
+            name: req.body.name,
+            image: img.data.link
+          })
+          req.flash('success_msg', '個人資料編輯成功!')
+          return res.redirect(`/users/${userId}`)
+        } catch (err) {
+          console.warn(err)
+        }
+      })
+    } else {
+      try {
+        const user = await User.findByPk(userId)
+        await user.update({
+          name: req.body.name,
+          image: defaultImg
+        })
+        req.flash('success_msg', '個人資料編輯成功!')
+        return res.redirect(`/users/${userId}`)
+      } catch (err) {
+        console.warn(err)
+      }
+    }
   }
 }
 
