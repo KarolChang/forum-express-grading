@@ -25,6 +25,11 @@
 {{!-- show comment --}}
 <h3>所有評論 : </h3>
 {{#each restaurant.Comments}}
+{{#if ../user.isAdmin}}
+<form action="/comments/{{this.id}}?_method=DELETE" method="POST" style="float: right;">
+  <button type="submit" class="btn btn-danger" onclick="return deleteCheck()">Delete</button>
+</form>
+{{/if}}
 <blockquote class="blockquote mb-0">
   <h4>
     <a href="/users/{{this.User.id}}">{{this.User.name}}</a>
@@ -46,3 +51,9 @@
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 <a href="javascript:history.back()">回上一頁</a>
+
+<script>
+  function deleteCheck() {
+    return confirm('確定刪除此評論?')
+  }
+</script>
