@@ -1,6 +1,7 @@
 const restController = require('../controllers/restController')
 const adminController = require('../controllers/adminController')
 const userController = require('../controllers/userController')
+const commentController = require('../controllers/commentController')
 
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
@@ -17,10 +18,12 @@ module.exports = (app, passport) => {
     if (helpers.ensureAuthenticated(req) && helpers.getUser(req).isAdmin) return next()
     return res.redirect('/')
   }
-  // 前台
+  // 前台 :餐廳
   app.get('/', authenticated, (req, res) => res.redirect('/restaurants'))
   app.get('/restaurants', authenticated, restController.getRestaurants)
   app.get('/restaurants/:id', authenticated, restController.getRestaurant)
+  // 前台 :評論
+  app.post('/comments', authenticated, commentController.postComment)
   // 後台 :餐廳
   app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))
   app.get('/admin/restaurants', authenticatedAdmin, adminController.getRestaurants)
