@@ -73,6 +73,15 @@ const restController = {
       return res.render('feeds', { restaurants, comments })
     })
       .catch(err => console.log(err))
+  },
+  // 瀏覽餐廳 dashboard
+  getDashboard: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, Comment] })
+      return res.render('dashboard', { restaurant: restaurant.toJSON() })
+    } catch (err) {
+      console.warn(err)
+    }
   }
 }
 

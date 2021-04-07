@@ -17,6 +17,7 @@
   </div>
   <div class="col-md-8">
     <p>{{restaurant.description}}</p>
+    <a href="/restaurants/{{restaurant.id}}/dashboard" class="btn btn-info">Dashboard</a>
   </div>
   <hr>
 </div>
@@ -50,6 +51,7 @@
   <input type="hidden" name="restaurantId" value="{{restaurant.id}}" />
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+</br>
 <a href="javascript:history.back()">回上一頁</a>
 
 <script>
