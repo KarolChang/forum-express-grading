@@ -3,6 +3,7 @@ const db = require('../models')
 const User = db.User
 const Comment = db.Comment
 const Restaurant = db.Restaurant
+const Favorite = db.Favorite
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
@@ -117,6 +118,40 @@ const userController = {
       } catch (err) {
         console.warn(err)
       }
+    }
+  },
+  // 新增至收藏
+  addFavorite: async (req, res) => {
+    try {
+      const UserId = helpers.getUser(req).id
+      const RestaurantId = req.params.restaurantId
+      const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
+      if (favorite) {
+        req.flash('success_msg', '此餐廳已經被收藏至最愛!')
+        return res.redirect('back')
+      }
+      await Favorite.create({ UserId, RestaurantId })
+      req.flash('success_msg', '此餐廳已收藏至最愛!')
+      return res.redirect('back')
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+  // 移除出收藏
+  removeFavorite: async (req, res) => {
+    try {
+      const UserId = helpers.getUser(req).id
+      const RestaurantId = req.params.restaurantId
+      const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
+      if (!favorite) {
+        req.flash('error_msg', '此餐廳未收藏在最愛!')
+        return res.redirect('back')
+      }
+      await favorite.destroy()
+      req.flash('error_msg', '此餐廳已被移除最愛!')
+      return res.redirect('back')
+    } catch (err) {
+      console.warn(err)
     }
   }
 }

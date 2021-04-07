@@ -30,6 +30,9 @@ module.exports = (app, passport) => {
   app.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
   // 前台 :評論
   app.post('/comments', authenticated, commentController.postComment)
+  // 前台 :收藏
+  app.post('/favorite/:restaurantId', authenticated, userController.addFavorite)
+  app.delete('/favorite/:restaurantId', authenticated, userController.removeFavorite)
   // 後台 :評論
   app.delete('/comments/:id', authenticatedAdmin, commentController.deleteComment)
   // 後台 :餐廳
