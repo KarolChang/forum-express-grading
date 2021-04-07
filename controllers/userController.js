@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const User = db.User
+const Comment = db.Comment
+const Restaurant = db.Restaurant
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
@@ -58,10 +60,9 @@ const userController = {
     try {
       const id = Number(req.params.id)
       const userId = helpers.getUser(req).id
-      // 跳轉至 profile 頁面
-      // if (id !== userId) return res.redirect(`/users/${id}`)
       const user = await User.findByPk(id)
-      return res.render('user', { userNow: user.toJSON(), id, userId })
+      const comments = await Comment.findAll({ raw: true, nest: true, where: { userId: id }, include: { model: Restaurant } })
+      return res.render('user', { userNow: user.toJSON(), id, userId, comments })
     } catch (err) {
       console.warn(err)
     }

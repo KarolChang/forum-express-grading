@@ -12,3 +12,15 @@
     {{/ifCond}}
   </div>
 </div>
+
+{{!-- 評論餐廳 --}}
+<h4>已評論 {{comments.length}} 家餐廳</h4>
+<div class="row mt-3">
+  {{#each comments}}
+  <div class="col-md-1">
+    <a href="/restaurants/{{this.Restaurant.id}}">
+      <img src="{{this.Restaurant.image}}" alt="rest-img" width=80vw;>
+    </a>
+  </div>
+  {{/each}}
+</div>
