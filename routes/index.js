@@ -26,6 +26,9 @@ module.exports = (app, passport) => {
   app.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
   // 前台 :美食達人
   app.get('/users/top', authenticated, userController.getTopUser)
+  // 前台 :追蹤美食達人
+  app.post('/following/:userId', authenticated, userController.addFollowing)
+  app.delete('/following/:userId', authenticated, userController.removeFollowing)
   // 前台 : Profile
   app.get('/users/:id', authenticated, userController.getUser)
   app.get('/users/:id/edit', authenticated, userController.editUser)

@@ -5,9 +5,11 @@ const Comment = db.Comment
 const Restaurant = db.Restaurant
 const Favorite = db.Favorite
 const Like = db.Like
+const Followship = db.Followship
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
+const app = require('../app')
 const defaultImg = 'https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809'
 
 const userController = {
@@ -171,23 +173,49 @@ const userController = {
       console.warn(err)
     }
   },
-  // 美食達人
+  // 美食達人頁面
   getTopUser: async (req, res) => {
-  try {
-    let users = await User.findAll({
-      include: [
-        { model: User, as: 'Followers' }
-      ]
-    })
-    users = users.map(user => ({
-      ...user.dataValues,
-      FollowerCount: user.Followers.length,
-      isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
-    }))
-    users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-    return res.render('topUser', { users })
-  } catch (err) {
-    console.warn(err)
+    try {
+      let users = await User.findAll({
+        include: [
+          { model: User, as: 'Followers' }
+        ]
+      })
+      users = users.map(user => ({
+        ...user.dataValues,
+        FollowerCount: user.Followers.length,
+        isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
+      }))
+      users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
+      return res.render('topUser', { users })
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+  // 追蹤美食達人
+  addFollowing: async (req, res) => {
+    try {
+      const followingId = req.params.userId
+      const followerId = helpers.getUser(req).id
+      await Followship.create({ followingId, followerId })
+      req.flash('success_msg', '已追蹤!')
+      return res.redirect('back')
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+  // 取消追蹤美食達人
+  removeFollowing: async (req, res) => {
+    try {
+      const followingId = req.params.userId
+      const followerId = helpers.getUser(req).id
+      const follow = await Followship.findOne({ where: { followingId, followerId } })
+      await follow.destroy()
+      req.flash('error_msg', '已取消追蹤!')
+      return res.redirect('back')
+    } catch (err) {
+      console.warn(err)
+    }
   }
 }
 
