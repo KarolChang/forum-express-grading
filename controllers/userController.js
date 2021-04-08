@@ -125,11 +125,6 @@ const userController = {
     try {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
-      const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
-      if (favorite) {
-        req.flash('success_msg', '此餐廳已經被收藏至最愛!')
-        return res.redirect('back')
-      }
       await Favorite.create({ UserId, RestaurantId })
       req.flash('success_msg', '此餐廳已收藏至最愛!')
       return res.redirect('back')
@@ -143,10 +138,6 @@ const userController = {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
       const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
-      if (!favorite) {
-        req.flash('error_msg', '此餐廳未收藏在最愛!')
-        return res.redirect('back')
-      }
       await favorite.destroy()
       req.flash('error_msg', '此餐廳已被移除最愛!')
       return res.redirect('back')

@@ -30,7 +30,8 @@ const restController = {
       const data = await result.rows.map(r => ({
         ...r.dataValues,
         description: r.dataValues.description.substring(0, 50),
-        categoryName: r.dataValues.Category.name
+        categoryName: r.dataValues.Category.name,
+        isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(r.id)
       }))
       const categories = await Category.findAll({ raw: true, nest: true })
       return res.render('restaurants', { restaurants: data, categories, categoryId, page, pages, totalPage, prev, next })
