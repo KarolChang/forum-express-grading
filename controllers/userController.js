@@ -9,7 +9,6 @@ const Followship = db.Followship
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
-const app = require('../app')
 const defaultImg = 'https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809'
 
 const userController = {
@@ -215,6 +214,34 @@ const userController = {
       return res.redirect('back')
     } catch (err) {
       console.warn(err)
+    }
+  },
+  // 人氣餐廳頁面
+  getTopRestaurant: async (req, res, next) => {
+    try {
+      const topNumber = 10
+      const UserId = helpers.getUser(req).id
+      const user = await User.findByPk(UserId, {
+        include: [
+          { model: Restaurant, as: 'FavoritedRestaurants' }
+        ]
+      })
+      let restaurants = await Restaurant.findAll({
+        include: [
+          { model: User, as: 'FavoritedUsers' }
+        ]
+      })
+      restaurants = restaurants.map(r => ({
+        ...r.dataValues,
+        description: r.dataValues.description.substring(0, 20),
+        favoriteCount: r.FavoritedUsers.length,
+        isFavorited: user.FavoritedRestaurants.map(d => d.id).includes(r.id)
+      }))
+      restaurants = restaurants.sort((a, b) => b.favoriteCount - a.favoriteCount)
+      restaurants = restaurants.slice(0, topNumber)
+      return res.render('topRestaurant', { restaurants })
+    } catch (err) {
+      next(err)
     }
   }
 }

@@ -30,7 +30,7 @@
 
     {{#if isLiked}}
     <form action="/like/{{restaurant.id}}?_method=DELETE" method="POST" style="display: inline;">
-      <button type="submit" class="btn btn-danger">unLike</button>
+      <button type="submit" class="btn btn-danger">Unlike</button>
     </form>
     {{else}}
     <form action="/like/{{restaurant.id}}" method="POST" style="display: inline;">
@@ -72,6 +72,7 @@
 </form>
 </br>
 <a href="javascript:history.back()">回上一頁</a>
+
 
 <script>
   function deleteCheck() {

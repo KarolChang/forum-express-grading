@@ -4,6 +4,7 @@ const Category = db.Category
 const Comment = db.Comment
 const User = db.User
 const pageLimit = 10
+const helpers = require('../_helpers')
 
 const restController = {
   // 瀏覽所有餐廳
@@ -51,8 +52,8 @@ const restController = {
           { model: User, as: 'LikedUsers' }
         ]
       })
-      const isFavorited = restaurant.FavoritedUsers.map(d => d.id).includes(req.user.id)
-      const isLiked = restaurant.LikedUsers.map(d => d.id).includes(req.user.id)
+      const isFavorited = restaurant.FavoritedUsers.map(d => d.id).includes(helpers.getUser(req).id)
+      const isLiked = restaurant.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id)
       restaurant.viewCounts += 1
       await restaurant.save()
       return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited, isLiked })

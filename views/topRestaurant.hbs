@@ -1,0 +1,42 @@
+{{!-- 導覽列 --}}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link" href="/restaurants">首頁</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/restaurants/feeds">最新動態</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/users/top">美食達人</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="/restaurants/top">Top10人氣餐廳</a>
+  </li>
+</ul>
+<br /><br />
+
+<h1>人氣餐廳</h1>
+<hr />
+
+{{#each restaurants}}
+<div class="row mb-5">
+  <div class="col-md-6 text-center">
+    <img src="{{this.image}}" alt="rest-img">
+  </div>
+  <div class="col-md-6">
+    <h4>{{this.name}}</h4>
+    <div class="badge badge-info">收藏數 : {{this.favoriteCount}}</div>
+    <p>{{this.description}}</p>
+    <a href="/restaurants/{{this.id}}" class="btn btn-primary">Show</a>
+    {{#if this.isFavorited}}
+    <form action="/favorite/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+      <button type="submit" class="btn btn-danger">移除最愛</button>
+    </form>
+    {{else}}
+    <form action="/favorite/{{this.id}}" method="POST" style="display: inline;">
+      <button type="submit" class="btn btn-primary">加入最愛</button>
+    </form>
+    {{/if}}
+  </div>
+</div>
+{{/each}}
