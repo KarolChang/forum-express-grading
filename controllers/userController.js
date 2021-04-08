@@ -4,6 +4,7 @@ const User = db.User
 const Comment = db.Comment
 const Restaurant = db.Restaurant
 const Favorite = db.Favorite
+const Like = db.Like
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
@@ -145,24 +146,48 @@ const userController = {
       console.warn(err)
     }
   },
-  // 美食達人
-  getTopUser: async (req, res) => {
+  // 新增至 Like
+  addLike: async (req, res) => {
     try {
-      let users = await User.findAll({
-        include: [
-          { model: User, as: 'Followers' }
-        ]
-      })
-      users = users.map(user => ({
-        ...user.dataValues,
-        FollowerCount: user.Followers.length,
-        isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
-      }))
-      users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-      return res.render('topUser', { users })
+      const UserId = helpers.getUser(req).id
+      const RestaurantId = req.params.restaurantId
+      await Like.create({ UserId, RestaurantId })
+      req.flash('success_msg', '加入Like成功!')
+      return res.redirect('back')
     } catch (err) {
       console.warn(err)
     }
+  },
+  // 移除至 Like
+  removeLike: async (req, res) => {
+    try {
+      const UserId = helpers.getUser(req).id
+      const RestaurantId = req.params.restaurantId
+      const like = await Like.findOne({ where: { UserId, RestaurantId } })
+      await like.destroy()
+      req.flash('error_msg', '已移除Like!')
+      return res.redirect('back')
+    } catch (err) {
+      console.warn(err)
+    }
+  },
+  // 美食達人
+  getTopUser: async (req, res) => {
+  try {
+    let users = await User.findAll({
+      include: [
+        { model: User, as: 'Followers' }
+      ]
+    })
+    users = users.map(user => ({
+      ...user.dataValues,
+      FollowerCount: user.Followers.length,
+      isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
+    }))
+    users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
+    return res.render('topUser', { users })
+  } catch (err) {
+    console.warn(err)
   }
 }
 
