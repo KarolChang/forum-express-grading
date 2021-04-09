@@ -132,6 +132,7 @@ const userController = {
       return res.redirect('back')
     } catch (err) {
       console.warn(err)
+      return res.render('error', { err })
     }
   },
   // 移除出收藏
