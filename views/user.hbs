@@ -1,26 +1,102 @@
 <div class="row">
   <div class="col-md-4">
-    <img class="img-responsive center-block" src="{{userNow.image}}" alt="user-image" width="350px"
+    <img class="img-responsive center-block" src="{{userSearch.image}}" alt="user-image" width="350px"
       style="margin-bottom: 25px;">
   </div>
   <div class="col-md-8">
-    <h3>{{userNow.name}}</h3>
-    <h5>{{userNow.email}}</h5>
-    {{!-- 如果是該用戶才顯示 EDIT 按鈕 --}}
-    {{#ifCond id userId}}
+    <h3>{{userSearch.name}}</h3>
+    <h5>{{userSearch.email}}</h5>
+    <h5>已評論 {{comments.length}} 家餐廳</h5>
+    <h5>已收藏 {{userSearch.FavoritedRestaurants.length}} 家餐廳</h5>
+    <h5>已追隨 {{userSearch.Followings.length}} 個美食達人(following)</h5>
+    <h5>已被 {{userSearch.Followers.length}} 個美食達人追隨(follower)</h5>
+
+    {{#ifCond userNow.id userSearch.id}}
+    {{!-- 如果是該用戶，就顯示 EDIT 按鈕 --}}
     <a href="/users/{{userNow.id}}/edit" class="btn btn-success">Edit</a>
+    {{else}}
+    {{!-- 如果是該用戶，就不顯示 追蹤 按鈕 --}}
+    {{#if isFollowed}}
+    <form action="/following/{{userSearch.id}}?_method=DELETE" method="POST" style="display: contents;">
+      <button type="submit" class="btn btn-danger">取消追蹤</button>
+    </form>
+    {{else}}
+    <form action="/following/{{userSearch.id}}" method="POST" style="display: contents;">
+      <button type="submit" class="btn btn-primary">追蹤</button>
+    </form>
+    {{/if}}
     {{/ifCond}}
   </div>
 </div>
 
 {{!-- 評論餐廳 --}}
-<h4>已評論 {{comments.length}} 家餐廳</h4>
 <div class="row mt-3">
-  {{#each comments}}
-  <div class="col-md-1">
-    <a href="/restaurants/{{this.Restaurant.id}}">
-      <img src="{{this.Restaurant.image}}" alt="rest-img" width=80vw;>
-    </a>
+  <div class="card">
+    <div class="card-header">
+      <h5>已評論 {{comments.length}} 家餐廳</h5>
+    </div>
+    <div class="card-body d-flex flex-wrap">
+      {{#each comments}}
+      <div class="mr-3 mb-3">
+        <a href="/restaurants/{{this.Restaurant.id}}">
+          <img src="{{this.Restaurant.image}}" alt="rest-comment-img" width=80vw;>
+        </a>
+      </div>
+      {{/each}}
+    </div>
   </div>
-  {{/each}}
+</div>
+
+{{!-- 收藏餐廳 --}}
+<div class="row mt-3">
+  <div class="card">
+    <div class="card-header">
+      <h5>已收藏 {{userSearch.FavoritedRestaurants.length}} 家餐廳</h5>
+    </div>
+    <div class="card-body d-flex flex-wrap">
+      {{#each userSearch.FavoritedRestaurants}}
+      <div class="mr-3 mb-3">
+        <a href="/restaurants/{{this.id}}">
+          <img src="{{this.image}}" alt="rest-favorite-img" width=80vw;>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+{{!-- 追隨美食達人 (following) --}}
+<div class="row mt-3">
+  <div class="card">
+    <div class="card-header">
+      <h5>已追隨 {{userSearch.Followings.length}} 個美食達人 (following)</h5>
+    </div>
+    <div class="card-body d-flex flex-wrap">
+      {{#each userSearch.Followings}}
+      <div class="mr-3 mb-3">
+        <a href="/users/{{this.id}}">
+          <img src="{{this.image}}" alt="user-following-img" width=80vw;>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+{{!-- 被追隨的美食達人 (follower) --}}
+<div class="row mt-3">
+  <div class="card">
+    <div class="card-header">
+      <h5>已被 {{userSearch.Followers.length}} 個美食達人追隨 (follower)</h5>
+    </div>
+    <div class="card-body d-flex flex-wrap">
+      {{#each userSearch.Followers}}
+      <div class="mr-3 mb-3">
+        <a href="/users/{{this.id}}">
+          <img src="{{this.image}}" alt="user-follower-img" width=80vw;>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </div>
 </div>

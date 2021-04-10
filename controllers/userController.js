@@ -63,11 +63,35 @@ const userController = {
     try {
       const id = Number(req.params.id)
       const userId = helpers.getUser(req).id
-      const user = await User.findByPk(id)
-      const comments = await Comment.findAll({ raw: true, nest: true, where: { userId: id }, include: { model: Restaurant } })
-      return res.render('user', { userNow: user.toJSON(), id, userId, comments })
+      const userNow = await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' }
+        ]
+      })
+      const userSearch = await User.findByPk(id, {
+        include: [
+          { model: Restaurant, as: 'FavoritedRestaurants' },
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' }
+        ]
+      })
+      const isFollowed = userNow.Followings.map(d => d.id).includes(id)
+      const comments = await Comment.findAll({
+        raw: true,
+        nest: true,
+        where: { userId: id },
+        include: { model: Restaurant }
+      })
+      return res.render('user', {
+        userNow: userNow.toJSON(),
+        userSearch: userSearch.toJSON(),
+        comments,
+        isFollowed
+      })
     } catch (err) {
       console.warn(err)
+      return res.render('error', { err })
     }
   },
   // 瀏覽編輯 Profile 頁面
@@ -187,7 +211,7 @@ const userController = {
         isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
       }))
       users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-      return res.render('topUser', { users })
+      return res.render('topUser', { users, userId: helpers.getUser(req).id })
     } catch (err) {
       console.warn(err)
     }
