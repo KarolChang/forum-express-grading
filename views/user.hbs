@@ -6,10 +6,10 @@
   <div class="col-md-8">
     <h3>{{userSearch.name}}</h3>
     <h5>{{userSearch.email}}</h5>
-    <h5>已評論 {{comments.length}} 家餐廳</h5>
-    <h5>已收藏 {{userSearch.FavoritedRestaurants.length}} 家餐廳</h5>
-    <h5>已追隨 {{userSearch.Followings.length}} 個美食達人(following)</h5>
-    <h5>已被 {{userSearch.Followers.length}} 個美食達人追隨(follower)</h5>
+    <h5><strong>{{comments.length}}</strong> 已評論餐廳</h5>
+    <h5><strong>{{userSearch.FavoritedRestaurants.length}}</strong> 收藏的餐廳</h5>
+    <h5><strong>{{userSearch.Followings.length}}</strong> followings</h5>
+    <h5><strong>{{userSearch.Followers.length}}</strong> followers</h5>
 
     {{#ifCond userNow.id userSearch.id}}
     {{!-- 如果是該用戶，就顯示 EDIT 按鈕 --}}

@@ -83,6 +83,11 @@ const userController = {
         where: { userId: id },
         include: { model: Restaurant }
       })
+      // console.log('cindb', commentsInDb)
+      // const comments = commentsInDb.filter((e, i, s) => {
+      //   return s.indexOf(e) === i
+      // })
+      // console.log('cs', comments)
       return res.render('user', {
         userNow: userNow.toJSON(),
         userSearch: userSearch.toJSON(),
