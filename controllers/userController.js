@@ -11,6 +11,15 @@ const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
 const defaultImg = 'https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809'
 
+const uploadImg = path => {
+  return new Promise((resolve, reject) => {
+    imgur.upload(path, (err, img) => {
+      if (err) return reject(err)
+      return resolve(img)
+    })
+  })
+}
+
 const userController = {
   // signup page
   signUpPage: (req, res) => {
@@ -116,31 +125,25 @@ const userController = {
   },
   // 編輯 Profile
   putUser: async (req, res) => {
-    const id = Number(req.params.id)
-    const userId = helpers.getUser(req).id
-    // 強制跳轉至 profile 頁面
-    if (userId !== id) {
-      return res.redirect(`/users/${id}`)
-    }
-    const { file } = req
-    if (file) {
-      imgur.setClientID(IMGUR_CLIENT_ID)
-      imgur.upload(file.path, async (err, img) => {
-        try {
-          if (err) console.log(err)
-          const user = await User.findByPk(userId)
-          await user.update({
-            name: req.body.name,
-            image: img.data.link
-          })
-          req.flash('success_msg', '個人資料編輯成功!')
-          return res.redirect(`/users/${userId}`)
-        } catch (err) {
-          console.warn(err)
-        }
-      })
-    } else {
-      try {
+    try {
+      const id = Number(req.params.id)
+      const userId = helpers.getUser(req).id
+      // 強制跳轉至 profile 頁面
+      if (userId !== id) {
+        return res.redirect(`/users/${id}`)
+      }
+      const { file } = req
+      if (file) {
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        const img = await uploadImg(file.path)
+        const user = await User.findByPk(userId)
+        await user.update({
+          name: req.body.name,
+          image: img.data.link
+        })
+        req.flash('success_msg', '個人資料編輯成功!')
+        return res.redirect(`/users/${userId}`)
+      } else {
         const user = await User.findByPk(userId)
         await user.update({
           name: req.body.name,
@@ -148,9 +151,10 @@ const userController = {
         })
         req.flash('success_msg', '個人資料編輯成功!')
         return res.redirect(`/users/${userId}`)
-      } catch (err) {
-        console.warn(err)
       }
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
     }
   },
   // 新增至收藏
