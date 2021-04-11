@@ -53,7 +53,7 @@ const adminController = {
         return res.redirect('/admin/restaurants')
       } else {
         await Restaurant.create({ name, tel, address, opening_hours, description, image: defaultImg, CategoryId: req.body.categoryId })
-        req.flash('success_messages', 'restaurant was successfully created')
+        req.flash('success_messages', '餐廳新增成功!')
         return res.redirect('/admin/restaurants')
       }
     } catch (err) {
@@ -157,7 +157,7 @@ const adminController = {
     try {
       const name = req.body.name.trim()
       if (!name) {
-        req.flash('error_msg', 'name didn\'t exist')
+        req.flash('error_msg', '請輸入非空白字串!')
         return res.redirect('back')
       }
       await Category.create({ name })
@@ -172,7 +172,7 @@ const adminController = {
     try {
       const name = req.body.name
       if (!name) {
-        req.flash('error_msg', 'name didn\'t exist')
+        req.flash('error_msg', '請輸入非空白字串!')
         return res.redirect('back')
       }
       const category = await Category.findByPk(req.params.id)

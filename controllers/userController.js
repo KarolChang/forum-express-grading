@@ -177,7 +177,7 @@ const userController = {
       const RestaurantId = req.params.restaurantId
       const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
       await favorite.destroy()
-      req.flash('error_msg', '此餐廳已被移除最愛!')
+      req.flash('success_msg', '此餐廳已被移除最愛!')
       return res.redirect('back')
     } catch (err) {
       console.warn(err)
@@ -202,7 +202,7 @@ const userController = {
       const RestaurantId = req.params.restaurantId
       const like = await Like.findOne({ where: { UserId, RestaurantId } })
       await like.destroy()
-      req.flash('error_msg', '已移除Like!')
+      req.flash('success_msg', '已移除Like!')
       return res.redirect('back')
     } catch (err) {
       console.warn(err)
@@ -246,7 +246,7 @@ const userController = {
       const followerId = helpers.getUser(req).id
       const follow = await Followship.findOne({ where: { followingId, followerId } })
       await follow.destroy()
-      req.flash('error_msg', '已取消追蹤!')
+      req.flash('success_msg', '已取消追蹤!')
       return res.redirect('back')
     } catch (err) {
       console.warn(err)
