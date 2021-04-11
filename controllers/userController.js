@@ -162,9 +162,16 @@ const userController = {
     try {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
-      await Favorite.create({ UserId, RestaurantId })
-      req.flash('success_msg', '此餐廳已收藏至最愛!')
-      return res.redirect('back')
+      // 判斷這筆 Favorite 是否已存在
+      const restaurant = await Favorite.findOne({where: { UserId, RestaurantId } })
+      if (restaurant) {
+        req.flash('success_msg', '這個餐廳在您加入最愛之前就被加入了!可能是因為網頁未刷新~')
+        return res.redirect('back')
+      } else {
+        await Favorite.create({ UserId, RestaurantId })
+        req.flash('success_msg', '此餐廳已收藏至最愛!')
+        return res.redirect('back')
+      }
     } catch (err) {
       console.warn(err)
       return res.render('error', { err })
@@ -176,9 +183,15 @@ const userController = {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
       const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
-      await favorite.destroy()
-      req.flash('success_msg', '此餐廳已被移除最愛!')
-      return res.redirect('back')
+      // 判斷這筆 Favorite 是否存在
+      if (favorite) {
+        await favorite.destroy()
+        req.flash('success_msg', '此餐廳已被移除最愛!')
+        return res.redirect('back')
+      } else {
+        req.flash('success_msg', '這個餐廳在您移除最愛之前就被移除了!可能是因為網頁未刷新~')
+        return res.redirect('back')
+      }
     } catch (err) {
       console.warn(err)
     }
@@ -188,11 +201,19 @@ const userController = {
     try {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
-      await Like.create({ UserId, RestaurantId })
-      req.flash('success_msg', '加入Like成功!')
-      return res.redirect('back')
+      // 判斷這筆 like 是否已存在
+      const like = await Like.findOne({ where: { UserId, RestaurantId } })
+      if (like) {
+        req.flash('success_msg', 'Like在您加入之前就被加入了!可能是因為網頁未刷新~')
+        return res.redirect('back')
+      } else {
+        await Like.create({ UserId, RestaurantId })
+        req.flash('success_msg', '加入Like成功!')
+        return res.redirect('back')
+      }
     } catch (err) {
       console.warn(err)
+      return res.render('error', { err })
     }
   },
   // 移除至 Like
@@ -201,8 +222,13 @@ const userController = {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
       const like = await Like.findOne({ where: { UserId, RestaurantId } })
-      await like.destroy()
-      req.flash('success_msg', '已移除Like!')
+      // 判斷這筆 like 是否存在
+      if (like) {
+        await like.destroy()
+        req.flash('success_msg', '已移除Like!')
+      } else {
+        req.flash('success_msg', 'Like在您移除之前就被移除了!可能是因為網頁未刷新~')
+      }
       return res.redirect('back')
     } catch (err) {
       console.warn(err)
