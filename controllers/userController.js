@@ -77,17 +77,19 @@ const userController = {
         ]
       })
       const isFollowed = userNow.Followings.map(d => d.id).includes(id)
-      const comments = await Comment.findAll({
+      const commentsInDb = await Comment.findAll({
         raw: true,
         nest: true,
         where: { userId: id },
         include: { model: Restaurant }
       })
-      // console.log('cindb', commentsInDb)
-      // const comments = commentsInDb.filter((e, i, s) => {
-      //   return s.indexOf(e) === i
-      // })
-      // console.log('cs', comments)
+      // 篩選重覆評論，列出不重複餐廳
+      const comments = []
+      commentsInDb.forEach(comment => {
+        if (!comments.some(item => item.RestaurantId === comment.RestaurantId)) {
+          comments.push(comment)
+        }
+      })
       return res.render('user', {
         userNow: userNow.toJSON(),
         userSearch: userSearch.toJSON(),
