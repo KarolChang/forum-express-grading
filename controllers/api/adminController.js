@@ -48,6 +48,12 @@ const adminController = {
     adminService.putCategory(req, res, (data) => {
       return res.json(data)
     })
+  },
+  // 刪除分類
+  deleteCategory: async (req, res) => {
+    adminService.deleteCategory(req, res, (data) => {
+      return res.json(data)
+    })
   }
 }
 

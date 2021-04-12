@@ -134,13 +134,14 @@ const adminController = {
   },
   // 刪除分類
   deleteCategory: async (req, res) => {
-    try {
-      const category = await Category.findByPk(req.params.id)
-      await category.destroy()
+    adminService.deleteCategory(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_msg', data.message)
+        return res.redirect('back')
+      }
+      req.flash('success_msg', data.message)
       return res.redirect('/admin/categories')
-    } catch (err) {
-      console.warn(err)
-    }
+    })
   }
 }
 

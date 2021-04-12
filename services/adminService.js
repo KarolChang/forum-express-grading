@@ -132,6 +132,20 @@ const adminService = {
       console.warn(err)
       return res.render('error', { err })
     }
+  },
+  // 刪除分類
+  deleteCategory: async (req, res, callback) => {
+    try {
+      const category = await Category.findByPk(req.params.id)
+      if (category) {
+        await category.destroy()
+        callback({ status: 'success', message: '分類已刪除!'})
+      }
+      callback({ status: 'error', message: '分類不存在!'})
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
   }
 }
 
