@@ -10,6 +10,7 @@ const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const helpers = require('../_helpers')
 const defaultImg = 'https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809'
+const sequelize = require('sequelize')
 
 const uploadImg = path => {
   return new Promise((resolve, reject) => {
@@ -283,21 +284,23 @@ const userController = {
     try {
       const topNumber = 10
       const UserId = helpers.getUser(req).id
-      const user = await User.findByPk(UserId, {
-        include: [
-          { model: Restaurant, as: 'FavoritedRestaurants' }
-        ]
-      })
       let restaurants = await Restaurant.findAll({
-        include: [
-          { model: User, as: 'FavoritedUsers' }
-        ]
+        include: { model: User, as: 'FavoritedUsers' },
+        attributes: {
+          include: [
+            [
+              sequelize.literal('(SELECT COUNT(*) FROM Favorites WHERE Favorites.RestaurantId = Restaurant.id GROUP BY favorites.RestaurantId)'), 'favoriteCount'
+            ]
+          ]
+        },
+        order: [[sequelize.literal('favoriteCount'), 'DESC']],
+        limit: 10
       })
       restaurants = restaurants.map(r => ({
         ...r.dataValues,
         description: r.dataValues.description.substring(0, 20),
         favoriteCount: r.FavoritedUsers.length,
-        isFavorited: user.FavoritedRestaurants.map(d => d.id).includes(r.id)
+        isFavorited: r.FavoritedUsers.map(d => d.id).includes(UserId)
       }))
       restaurants = restaurants.sort((a, b) => b.favoriteCount - a.favoriteCount)
       restaurants = restaurants.slice(0, topNumber)
