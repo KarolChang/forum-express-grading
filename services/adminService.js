@@ -35,20 +35,6 @@ const adminService = {
       })
       .catch(err => console.log(err))
   },
-  // 瀏覽類別列表
-  getCategories: async (req, res, callback) => {
-    try {
-      const categories = await Category.findAll({ raw: true, nest: true })
-      if (req.params.id) {
-        const category = await Category.findByPk(req.params.id)
-        callback({ category: category.toJSON(), categories })
-      }
-      callback({ categories })
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
-  },
   // 新增一筆餐廳資料(post)
   postRestaurant: async (req, res, callback) => {
     try {
@@ -102,6 +88,34 @@ const adminService = {
     })
       .then(() => callback({ status: 'success', message: '餐廳已刪除!' }))
       .catch(err => console.log(err))
+  },
+  // 瀏覽類別列表
+  getCategories: async (req, res, callback) => {
+    try {
+      const categories = await Category.findAll({ raw: true, nest: true })
+      if (req.params.id) {
+        const category = await Category.findByPk(req.params.id)
+        callback({ category: category.toJSON(), categories })
+      }
+      callback({ categories })
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
+  },
+  // 新增分類
+  postCategories: async (req, res, callback) => {
+    try {
+      const name = req.body.name.trim()
+      if (!name) {
+        callback({ status: 'error', message: '請輸入非空白字串!' })
+      }
+      await Category.create({ name })
+      callback({ status: 'success', message: `成功新增 "${name}" 類別` })
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
   }
 }
 
