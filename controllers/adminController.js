@@ -32,29 +32,15 @@ const adminController = {
     })
   },
   // 新增一筆餐廳資料(post)
-  postRestaurant: async (req, res) => {
-    try {
-      const { name, tel, address, opening_hours, description } = req.body
-      if (!name) {
-        req.flash('error_msg', 'name是必填項目!')
+  postRestaurant: (req, res) => {
+    adminService.postRestaurant(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_msg', data.message)
         return res.redirect('back')
       }
-      const { file } = req
-      if (file) {
-        imgur.setClientID(IMGUR_CLIENT_ID)
-        const img = await uploadImg(file.path)
-        await Restaurant.create({ name, tel, address, opening_hours, description, image: img.data.link, CategoryId: req.body.categoryId })
-        req.flash('success_messages', '餐廳新增成功!')
-        return res.redirect('/admin/restaurants')
-      } else {
-        await Restaurant.create({ name, tel, address, opening_hours, description, image: defaultImg, CategoryId: req.body.categoryId })
-        req.flash('success_messages', '餐廳新增成功!')
-        return res.redirect('/admin/restaurants')
-      }
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
+      req.flash('success_msg', data.message)
+      return res.redirect('/admin/restaurants')
+    })
   },
   // 瀏覽一筆餐廳資料
   getRestaurant: (req, res) => {
@@ -104,6 +90,7 @@ const adminController = {
   deleteRestaurant: (req, res) => {
     adminService.deleteRestaurant(req, res, (data) => {
       if (data.status === 'success') {
+        req.flash('success_msg', data.message)
         return res.redirect('/admin/restaurants')
       }
     })
