@@ -36,6 +36,27 @@ const userController = {
       console.warn(err)
       return res.render('error', { err })
     }
+  },
+  signUp: async (req, res) => {
+    try {
+      if (req.body.passwordCheck !== req.body.password) {
+        return res.json({ status: 'error', message: '密碼與確認密碼不相符!' })
+      } else {
+        const user = await User.findOne({ where: { email: req.body.email } })
+        if (user) {
+          return res.json({ status: 'error', message: '此信箱已被註冊!' })
+        }
+        User.create({
+          name: req.body.name,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null)
+        })
+        return res.json({ status: 'success', message: '註冊成功!' })
+      }
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
   }
 }
 
