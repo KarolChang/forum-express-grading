@@ -19,18 +19,24 @@ const adminController = {
       return res.json(data)
     })
   },
-  // 刪除一筆餐廳資料(delete)
-  deleteRestaurant: (req, res) => {
-    adminService.deleteRestaurant(req, res, (data) => {
-      return res.json(data)
-    })
-  },
   // 新增一筆餐廳資料(post)
   postRestaurant: (req, res) => {
     adminService.postRestaurant(req, res, (data) => {
       return res.json(data)
     })
   },
+  // 刪除一筆餐廳資料(delete)
+  deleteRestaurant: (req, res) => {
+    adminService.deleteRestaurant(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 編輯一筆餐廳資料(put)
+  putRestaurant: (req, res) => {
+    adminService.putRestaurant(req, res, (data) => {
+      return res.json(data)
+    })
+  }
 }
 
 module.exports = adminController

@@ -49,14 +49,6 @@ const adminService = {
       return res.render('error', { err })
     }
   },
-  // 刪除一筆餐廳資料(delete)
-  deleteRestaurant: (req, res, callback) => {
-    return Restaurant.findByPk(req.params.id).then(restaurant => {
-      restaurant.destroy()
-    })
-      .then(() => callback({ status: 'success', message: '餐廳已刪除!' }))
-      .catch(err => console.log(err))
-  },
   // 新增一筆餐廳資料(post)
   postRestaurant: async (req, res, callback) => {
     try {
@@ -78,6 +70,38 @@ const adminService = {
       console.warn(err)
       return res.render('error', { err })
     }
+  },
+  // 編輯一筆餐廳資料(put)
+  putRestaurant: async (req, res, callback) => {
+    try {
+      const { name, tel, address, opening_hours, description } = req.body
+      if (!name) {
+        callback({ status: 'error', message: 'name是必填項目!'})
+      }
+      const { file } = req
+      if (file) {
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        const img = await uploadImg(file.path)
+        const restaurant = await Restaurant.findByPk(req.params.id)
+        await restaurant.update({ name, tel, address, opening_hours, description, image: img.data.link, CategoryId: req.body.categoryId })
+        callback({ status: 'success', message: '餐廳編輯成功!'})
+      } else {
+        const restaurant = await Restaurant.findByPk(req.params.id)
+        await restaurant.update({ name, tel, address, opening_hours, description, image: restaurant.image, CategoryId: req.body.categoryId })
+        callback({ status: 'success', message: '餐廳編輯成功!'})
+      }
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
+  },
+  // 刪除一筆餐廳資料(delete)
+  deleteRestaurant: (req, res, callback) => {
+    return Restaurant.findByPk(req.params.id).then(restaurant => {
+      restaurant.destroy()
+    })
+      .then(() => callback({ status: 'success', message: '餐廳已刪除!' }))
+      .catch(err => console.log(err))
   }
 }
 

@@ -61,30 +61,14 @@ const adminController = {
   },
   // 編輯一筆餐廳資料(put)
   putRestaurant: async (req, res) => {
-    try {
-      const { name, tel, address, opening_hours, description } = req.body
-      if (!name) {
-        req.flash('error_msg', 'name是必填項目!')
+    adminService.putRestaurant(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_msg', data.message)
         return res.redirect('back')
       }
-      const { file } = req
-      if (file) {
-        imgur.setClientID(IMGUR_CLIENT_ID)
-        const img = await uploadImg(file.path)
-        const restaurant = await Restaurant.findByPk(req.params.id)
-        await restaurant.update({ name, tel, address, opening_hours, description, image: img.data.link, CategoryId: req.body.categoryId })
-        req.flash('success_msg', '餐廳編輯成功!')
-        res.redirect('/admin/restaurants')
-      } else {
-        const restaurant = await Restaurant.findByPk(req.params.id)
-        await restaurant.update({ name, tel, address, opening_hours, description, image: restaurant.image, CategoryId: req.body.categoryId })
-        req.flash('success_msg', '餐廳編輯成功!')
-        return res.redirect('/admin/restaurants')
-      }
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
+      req.flash('success_msg', data.message)
+      return res.redirect('/admin/restaurants')
+    })
   },
   // 刪除一筆餐廳資料(delete)
   deleteRestaurant: (req, res) => {
