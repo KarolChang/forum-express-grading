@@ -22,6 +22,20 @@ const adminService = {
         callback({ restaurant: restaurant.toJSON() })
       })
       .catch(err => console.log(err))
+  },
+  // 瀏覽類別列表
+  getCategories: async (req, res, callback) => {
+    try {
+      const categories = await Category.findAll({ raw: true, nest: true })
+      if (req.params.id) {
+        const category = await Category.findByPk(req.params.id)
+        callback({ category: category.toJSON(), categories })
+      }
+      callback({ categories })
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
   }
 }
 

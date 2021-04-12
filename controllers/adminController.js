@@ -134,17 +134,10 @@ const adminController = {
       .catch(err => console.log(err))
   },
   // 瀏覽類別列表
-  getCategories: async (req, res) => {
-    try {
-      const categories = await Category.findAll({ raw: true, nest: true })
-      if (req.params.id) {
-        const category = await Category.findByPk(req.params.id)
-        return res.render('admin/categories', { category: category.toJSON(), categories })
-      }
-      return res.render('admin/categories', { categories })
-    } catch (err) {
-      console.warn(err)
-    }
+  getCategories: (req, res) => {
+    adminService.getCategories(req, res, (data) => {
+      return res.render('admin/categories', data)
+    })
   },
   // 新增分類
   postCategories: async (req, res) => {
