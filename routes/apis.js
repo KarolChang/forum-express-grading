@@ -5,6 +5,7 @@ const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
 
 const adminController = require('../controllers/api/adminController')
+const userController = require('../controllers/api/userController')
 
 // admin/restaurants
 router.get('/admin/restaurants', adminController.getRestaurants)
@@ -18,5 +19,8 @@ router.get('/admin/categories', adminController.getCategories)
 router.post('/admin/categories', adminController.postCategories)
 router.put('/admin/categories/:id', adminController.putCategory)
 router.delete('/admin/categories/:id', adminController.deleteCategory)
+
+// JWT signin
+router.post('/signin', userController.signIn)
 
 module.exports = router
