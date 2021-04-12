@@ -16,19 +16,14 @@ const uploadImg = path => {
   })
 }
 
+const adminService = require('../services/adminService')
+
 const adminController = {
   // 瀏覽餐廳總表
   getRestaurants: (req, res) => {
-    return Restaurant.findAll({
-      raw: true,
-      nest: true,
-      include: [Category],
-      order: [['createdAt', 'DESC']]
+    adminService.getRestaurants(req, res, (data) => {
+      return res.render('admin/restaurants', data)
     })
-      .then(restaurants => {
-        return res.render('admin/restaurants', { restaurants })
-      })
-      .catch(err => console.log(err))
   },
   // 新增一筆餐廳資料(get)
   createRestaurant: (req, res) => {
