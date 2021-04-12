@@ -123,19 +123,14 @@ const adminController = {
   },
   // 編輯分類
   putCategory: async (req, res) => {
-    try {
-      const name = req.body.name
-      if (!name) {
-        req.flash('error_msg', '請輸入非空白字串!')
+    adminService.putCategory(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_msg', data.message)
         return res.redirect('back')
       }
-      const category = await Category.findByPk(req.params.id)
-      category.update(req.body)
-      req.flash('success_msg', `成功修改 "${name}" 類別`)
+      req.flash('success_msg', data.message)
       return res.redirect('/admin/categories')
-    } catch (err) {
-      console.warn(err)
-    }
+    })
   },
   // 刪除分類
   deleteCategory: async (req, res) => {

@@ -109,9 +109,25 @@ const adminService = {
       const name = req.body.name.trim()
       if (!name) {
         callback({ status: 'error', message: '請輸入非空白字串!' })
+      } else {
+        await Category.create({ name })
+        callback({ status: 'success', message: `成功新增 "${name}" 類別` })
       }
-      await Category.create({ name })
-      callback({ status: 'success', message: `成功新增 "${name}" 類別` })
+    } catch (err) {
+      console.warn(err)
+      return res.render('error', { err })
+    }
+  },
+  // 編輯分類
+  putCategory: async (req, res, callback) => {
+    try {
+      const name = req.body.name.trim()
+      if (!name) {
+        callback({ status: 'error', message: '請輸入非空白字串!'})
+      }
+      const category = await Category.findByPk(req.params.id)
+      await category.update(req.body)
+      callback({ status: 'success', message: `成功修改 "${name}" 類別`})
     } catch (err) {
       console.warn(err)
       return res.render('error', { err })

@@ -42,6 +42,12 @@ const adminController = {
     adminService.postCategories(req, res, (data) => {
       return res.json(data)
     })
+  },
+  // 編輯分類
+  putCategory: async (req, res) => {
+    adminService.putCategory(req, res, (data) => {
+      return res.json(data)
+    })
   }
 }
 
