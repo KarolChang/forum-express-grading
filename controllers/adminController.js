@@ -58,10 +58,9 @@ const adminController = {
   },
   // 瀏覽一筆餐廳資料
   getRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id, { include: [Category] }).then(restaurant => {
-      return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
+    adminService.getRestaurant(req, res, (data) => {
+      return res.render('admin/restaurant', data)
     })
-      .catch(err => console.log(err))
   },
   // 編輯一筆餐廳資料(get)
   editRestaurant: (req, res) => {

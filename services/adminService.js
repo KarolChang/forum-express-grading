@@ -14,6 +14,14 @@ const adminService = {
         callback({ restaurants })
       })
       .catch(err => console.log(err))
+  },
+  // 瀏覽一筆餐廳資料
+  getRestaurant: (req, res, callback) => {
+    return Restaurant.findByPk(req.params.id, { include: [Category] })
+      .then(restaurant => {
+        callback({ restaurant: restaurant.toJSON() })
+      })
+      .catch(err => console.log(err))
   }
 }
 
