@@ -18,6 +18,12 @@ const adminController = {
     adminService.getCategories(req, res, (data) => {
       return res.json(data)
     })
+  },
+ // 刪除一筆餐廳資料(delete)
+  deleteRestaurant: (req, res) => {
+    adminService.deleteRestaurant(req, res, (data) => {
+      return res.json(data)
+    })
   }
 }
 

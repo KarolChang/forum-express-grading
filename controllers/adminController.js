@@ -102,11 +102,11 @@ const adminController = {
   },
   // 刪除一筆餐廳資料(delete)
   deleteRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id).then(restaurant => {
-      restaurant.destroy()
+    adminService.deleteRestaurant(req, res, (data) => {
+      if (data.status === 'success') {
+        return res.redirect('/admin/restaurants')
+      }
     })
-      .then(() => res.redirect('/admin/restaurants'))
-      .catch(err => console.log(err))
   },
   // 瀏覽使用者列表
   getUsers: (req, res) => {

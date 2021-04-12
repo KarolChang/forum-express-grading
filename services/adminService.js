@@ -36,6 +36,14 @@ const adminService = {
       console.warn(err)
       return res.render('error', { err })
     }
+  },
+  // 刪除一筆餐廳資料(delete)
+  deleteRestaurant: (req, res, callback) => {
+    return Restaurant.findByPk(req.params.id).then(restaurant => {
+      restaurant.destroy()
+    })
+      .then(() => callback({ status: 'success', message: '' }))
+      .catch(err => console.log(err))
   }
 }
 
