@@ -36,6 +36,12 @@ const adminController = {
     adminService.getUsers(req, res, (data) => {
       return res.json(data)
     })
+  },
+  // 修改使用者權限
+  toggleAdmin: (req, res) => {
+    adminService.toggleAdmin(req, res, (data) => {
+      return res.json(data)
+    })
   }
 }
 

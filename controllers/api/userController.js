@@ -7,6 +7,8 @@ const passportJWT = require('passport-jwt')
 const ExtractJWT = passportJWT.ExtractJWT
 const JwtStrategy = passportJWT.Strategy
 
+const userService = require('../../services/userService')
+
 const userController = {
   signIn: async (req, res) => {
     try {
@@ -57,6 +59,66 @@ const userController = {
       console.warn(err)
       return res.render('error', { err })
     }
+  },
+  // 瀏覽 Profile
+  getUser: (req, res) => {
+    userService.getUser(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 瀏覽編輯 Profile 頁面
+  editUser: (req, res) => {
+    userService.editUser(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 編輯 Profile
+  putUser: (req, res) => {
+    userService.putUser(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 新增至收藏
+  addFavorite: (req, res) => {
+    userService.addFavorite(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 移除出收藏
+  removeFavorite: (req, res) => {
+    userService.removeFavorite(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 新增至 Like
+  addLike: (req, res) => {
+    userService.addLike(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 移除至 Like
+  removeLike: (req, res) => {
+    userService.removeLike(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 美食達人頁面
+  getTopUser: (req, res) => {
+    userService.getTopUser(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 追蹤美食達人
+  addFollowing: (req, res) => {
+    userService.addFollowing(req, res, (data) => {
+      return res.json(data)
+    })
+  },
+  // 取消追蹤美食達人
+  removeFollowing: (req, res) => {
+    userService.removeFollowing(req, res, (data) => {
+      return res.json(data)
+    })
   }
 }
 

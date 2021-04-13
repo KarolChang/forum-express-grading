@@ -1,20 +1,6 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
-const User = db.User
 const Category = db.Category
-// const fs = require('fs')
-const imgur = require('imgur-node-api')
-const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
-const defaultImg = 'https://www.phoca.cz/images/projects/phoca-restaurant-menu-r.png'
-
-const uploadImg = path => {
-  return new Promise((resolve, reject) => {
-    imgur.upload(path, (err, img) => {
-      if (err) return reject(err)
-      return resolve(img)
-    })
-  })
-}
 
 const adminService = require('../services/adminService')
 const categoryService = require('../services/categoryService')
@@ -88,20 +74,12 @@ const adminController = {
   },
   // 修改使用者權限
   toggleAdmin: (req, res) => {
-    return User.findByPk(req.params.id).then(user => {
-      if (user.isAdmin) {
-        user.isAdmin = false
-      } else {
-        user.isAdmin = true
-      }
-      return user.save()
-    })
-      .then(user => {
-        const authority = user.isAdmin ? 'admin' : 'user'
-        req.flash('success_msg', `${user.name}已成功修改權限至: ${authority}!`)
+    adminService.toggleAdmin(req, res, (data) => {
+      if (data.status === 'success') {
+        req.flash('success_msg', data.message)
         return res.redirect('/admin/users')
-      })
-      .catch(err => console.log(err))
+      }
+    })
   },
   // 瀏覽類別列表
   getCategories: (req, res) => {
@@ -110,7 +88,7 @@ const adminController = {
     })
   },
   // 新增分類
-  postCategories: async (req, res) => {
+  postCategories: (req, res) => {
     categoryService.postCategories(req, res, (data) => {
       if (data.status === 'error') {
         req.flash('error_msg', data.message)
@@ -121,7 +99,7 @@ const adminController = {
     })
   },
   // 編輯分類
-  putCategory: async (req, res) => {
+  putCategory: (req, res) => {
     categoryService.putCategory(req, res, (data) => {
       if (data.status === 'error') {
         req.flash('error_msg', data.message)
@@ -132,7 +110,7 @@ const adminController = {
     })
   },
   // 刪除分類
-  deleteCategory: async (req, res) => {
+  deleteCategory: (req, res) => {
     categoryService.deleteCategory(req, res, (data) => {
       if (data.status === 'error') {
         req.flash('error_msg', data.message)

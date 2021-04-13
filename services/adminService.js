@@ -97,6 +97,22 @@ const adminService = {
         callback({ users })
       })
       .catch(err => console.log(err))
+  },
+  // 修改使用者權限
+  toggleAdmin: (req, res, callback) => {
+    return User.findByPk(req.params.id).then(user => {
+      if (user.isAdmin) {
+        user.isAdmin = false
+      } else {
+        user.isAdmin = true
+      }
+      return user.save()
+    })
+      .then(user => {
+        const authority = user.isAdmin ? 'admin' : 'user'
+        callback({ status: 'success', message: `${user.name}已成功修改權限至: ${authority}!`})
+      })
+      .catch(err => console.log(err))
   }
 }
 

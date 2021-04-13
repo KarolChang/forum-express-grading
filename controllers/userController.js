@@ -12,6 +12,8 @@ const helpers = require('../_helpers')
 const defaultImg = 'https://teameowdev.files.wordpress.com/2016/04/teameow-e9a090e8a8ade9a0ade8b2bc.jpg?w=809'
 const sequelize = require('sequelize')
 
+const userService = require('../services/userService')
+
 const uploadImg = path => {
   return new Promise((resolve, reject) => {
     imgur.upload(path, (err, img) => {
@@ -69,218 +71,77 @@ const userController = {
     res.redirect('/signin')
   },
   // 瀏覽 Profile
-  getUser: async (req, res) => {
-    try {
-      const id = Number(req.params.id)
-      const userId = helpers.getUser(req).id
-      // Promise.all()
-      const [userNow, userSearch, commentsInDb] = await Promise.all(
-        [
-          User.findByPk(userId, {
-            include: [
-              { model: User, as: 'Followers' },
-              { model: User, as: 'Followings' }
-            ]
-          }),
-          User.findByPk(id, {
-            include: [
-              { model: Restaurant, as: 'FavoritedRestaurants' },
-              { model: User, as: 'Followers' },
-              { model: User, as: 'Followings' }
-            ]
-          }),
-          Comment.findAll({
-            raw: true,
-            nest: true,
-            where: { userId: id },
-            include: { model: Restaurant }
-          })
-        ]
-      )
-      // 篩選重覆評論，列出不重複餐廳
-      const comments = []
-      commentsInDb.forEach(comment => {
-        if (!comments.some(item => item.RestaurantId === comment.RestaurantId)) {
-          comments.push(comment)
-        }
-      })
-      const isFollowed = userNow.Followings.map(d => d.id).includes(id)
-      return res.render('user', {
-        userNow: userNow.toJSON(),
-        userSearch: userSearch.toJSON(),
-        comments,
-        isFollowed
-      })
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
+  getUser: (req, res) => {
+    userService.getUser(req, res, (data) => {
+      return res.render('user', data)
+    })
   },
   // 瀏覽編輯 Profile 頁面
-  editUser: async (req, res) => {
-    try {
-      const id = Number(req.params.id)
-      const userId = helpers.getUser(req).id
-      // 強制跳轉至 profile 頁面
-      if (id !== userId) return res.redirect(`/users/${id}`)
-      const user = await User.findByPk(userId)
-      return res.render('editProfile', { user: user.toJSON() })
-    } catch (err) {
-      console.warn(err)
-    }
+  editUser: (req, res) => {
+    userService.editUser(req, res, (data) => {
+      if (data.status === 'error') {
+        return res.redirect(`/users/${data.id}`)
+      }
+      return res.render('editProfile', data)
+    })
   },
   // 編輯 Profile
-  putUser: async (req, res) => {
-    try {
-      const id = Number(req.params.id)
-      const userId = helpers.getUser(req).id
-      // 強制跳轉至 profile 頁面
-      if (userId !== id) {
-        return res.redirect(`/users/${id}`)
+  putUser: (req, res) => {
+    userService.putUser(req, res, (data) => {
+      if (data.status === 'error') {
+        return res.redirect(`/users/${data.id}`)
       }
-      const { file } = req
-      if (file) {
-        imgur.setClientID(IMGUR_CLIENT_ID)
-        const img = await uploadImg(file.path)
-        const user = await User.findByPk(userId)
-        await user.update({
-          name: req.body.name,
-          image: img.data.link
-        })
-        req.flash('success_msg', '個人資料編輯成功!')
-        return res.redirect(`/users/${userId}`)
-      } else {
-        const user = await User.findByPk(userId)
-        await user.update({
-          name: req.body.name,
-          image: defaultImg
-        })
-        req.flash('success_msg', '個人資料編輯成功!')
-        return res.redirect(`/users/${userId}`)
-      }
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
+      req.flash('success_msg', data.message)
+      return res.redirect(`/users/${data.userId}`)
+    })
   },
   // 新增至收藏
-  addFavorite: async (req, res) => {
-    try {
-      const UserId = helpers.getUser(req).id
-      const RestaurantId = req.params.restaurantId
-      // findOrCreate
-      const [favorite, created] = await Favorite.findOrCreate({ where: { UserId, RestaurantId } })
-      if (created) {
-        req.flash('success_msg', '此餐廳已收藏至最愛!')
-        return res.redirect('back')
-      } else {
-        req.flash('success_msg', '這個餐廳在您加入最愛之前就被加入了!可能是因為網頁未刷新~')
-        return res.redirect('back')
-      }
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
+  addFavorite: (req, res) => {
+    userService.addFavorite(req, res, (data) => {
+      req.flash('success_msg', data.message)
+      return res.redirect('back')
+    })
   },
   // 移除出收藏
-  removeFavorite: async (req, res) => {
-    try {
-      const UserId = helpers.getUser(req).id
-      const RestaurantId = req.params.restaurantId
-      const favorite = await Favorite.findOne({ where: { UserId, RestaurantId } })
-      // 判斷這筆 Favorite 是否存在
-      if (favorite) {
-        await favorite.destroy()
-        req.flash('success_msg', '此餐廳已被移除最愛!')
-        return res.redirect('back')
-      } else {
-        req.flash('success_msg', '這個餐廳在您移除最愛之前就被移除了!可能是因為網頁未刷新~')
-        return res.redirect('back')
-      }
-    } catch (err) {
-      console.warn(err)
-    }
+  removeFavorite: (req, res) => {
+    userService.removeFavorite(req, res, (data) => {
+      req.flash('success_msg', data.message)
+      return res.redirect('back')
+    })
   },
   // 新增至 Like
-  addLike: async (req, res) => {
-    try {
-      const UserId = helpers.getUser(req).id
-      const RestaurantId = req.params.restaurantId
-      // findOrCreate
-      const [like, created] = await Like.findOrCreate({ where: { UserId, RestaurantId } })
-      if (created) {
-        req.flash('success_msg', '加入Like成功!')
-        return res.redirect('back')
-      } else {
-        req.flash('success_msg', 'Like在您加入之前就被加入了!可能是因為網頁未刷新~')
-        return res.redirect('back')
-      }
-    } catch (err) {
-      console.warn(err)
-      return res.render('error', { err })
-    }
+  addLike: (req, res) => {
+    userService.addLike(req, res, (data) => {
+      req.flash('success_msg', data.message)
+      return res.redirect('back')
+    })
   },
   // 移除至 Like
-  removeLike: async (req, res) => {
-    try {
-      const UserId = helpers.getUser(req).id
-      const RestaurantId = req.params.restaurantId
-      const like = await Like.findOne({ where: { UserId, RestaurantId } })
-      // 判斷這筆 like 是否存在
-      if (like) {
-        await like.destroy()
-        req.flash('success_msg', '已移除Like!')
-      } else {
-        req.flash('success_msg', 'Like在您移除之前就被移除了!可能是因為網頁未刷新~')
-      }
+  removeLike: (req, res) => {
+    userService.removeLike(req, res, (data) => {
+      req.flash('success_msg', data.message)
       return res.redirect('back')
-    } catch (err) {
-      console.warn(err)
-    }
+    })
   },
   // 美食達人頁面
-  getTopUser: async (req, res) => {
-    try {
-      let users = await User.findAll({
-        include: [
-          { model: User, as: 'Followers' }
-        ]
-      })
-      users = users.map(user => ({
-        ...user.dataValues,
-        FollowerCount: user.Followers.length,
-        isFollowed: req.user.Followings.map(d => d.id).includes(user.id)
-      }))
-      users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-      return res.render('topUser', { users, userId: helpers.getUser(req).id })
-    } catch (err) {
-      console.warn(err)
-    }
+  getTopUser: (req, res) => {
+    userService.getTopUser(req, res, (data) => {
+      return res.render('topUser', data)
+    })
   },
   // 追蹤美食達人
-  addFollowing: async (req, res) => {
-    try {
-      const followingId = req.params.userId
-      const followerId = helpers.getUser(req).id
-      await Followship.create({ followingId, followerId })
-      req.flash('success_msg', '已追蹤!')
+  addFollowing: (req, res) => {
+    userService.addFollowing(req, res, (data) => {
+      req.flash('success_msg', data.message)
       return res.redirect('back')
-    } catch (err) {
-      console.warn(err)
-    }
+    })
   },
   // 取消追蹤美食達人
-  removeFollowing: async (req, res) => {
-    try {
-      const followingId = req.params.userId
-      const followerId = helpers.getUser(req).id
-      const follow = await Followship.findOne({ where: { followingId, followerId } })
-      await follow.destroy()
-      req.flash('success_msg', '已取消追蹤!')
+  removeFollowing: (req, res) => {
+    userService.removeFollowing(req, res, (data) => {
+      req.flash('success_msg', data.message)
       return res.redirect('back')
-    } catch (err) {
-      console.warn(err)
-    }
+    })
   },
   // 人氣餐廳頁面
   getTopRestaurant: async (req, res, next) => {
