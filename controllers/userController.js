@@ -163,14 +163,13 @@ const userController = {
     try {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
-      // 判斷這筆 Favorite 是否已存在
-      const restaurant = await Favorite.findOne({where: { UserId, RestaurantId } })
-      if (restaurant) {
-        req.flash('success_msg', '這個餐廳在您加入最愛之前就被加入了!可能是因為網頁未刷新~')
+      // findOrCreate
+      const [favorite, created] = await Favorite.findOrCreate({ where: { UserId, RestaurantId } })
+      if (created) {
+        req.flash('success_msg', '此餐廳已收藏至最愛!')
         return res.redirect('back')
       } else {
-        await Favorite.create({ UserId, RestaurantId })
-        req.flash('success_msg', '此餐廳已收藏至最愛!')
+        req.flash('success_msg', '這個餐廳在您加入最愛之前就被加入了!可能是因為網頁未刷新~')
         return res.redirect('back')
       }
     } catch (err) {
@@ -202,14 +201,13 @@ const userController = {
     try {
       const UserId = helpers.getUser(req).id
       const RestaurantId = req.params.restaurantId
-      // 判斷這筆 like 是否已存在
-      const like = await Like.findOne({ where: { UserId, RestaurantId } })
-      if (like) {
-        req.flash('success_msg', 'Like在您加入之前就被加入了!可能是因為網頁未刷新~')
+      // findOrCreate
+      const [like, created] = await Like.findOrCreate({ where: { UserId, RestaurantId } })
+      if (created) {
+        req.flash('success_msg', '加入Like成功!')
         return res.redirect('back')
       } else {
-        await Like.create({ UserId, RestaurantId })
-        req.flash('success_msg', '加入Like成功!')
+        req.flash('success_msg', 'Like在您加入之前就被加入了!可能是因為網頁未刷新~')
         return res.redirect('back')
       }
     } catch (err) {
