@@ -17,6 +17,7 @@ const uploadImg = path => {
 }
 
 const adminService = require('../services/adminService')
+const categoryService = require('../services/categoryService')
 
 const adminController = {
   // 瀏覽餐廳總表
@@ -106,13 +107,13 @@ const adminController = {
   },
   // 瀏覽類別列表
   getCategories: (req, res) => {
-    adminService.getCategories(req, res, (data) => {
+    categoryService.getCategories(req, res, (data) => {
       return res.render('admin/categories', data)
     })
   },
   // 新增分類
   postCategories: async (req, res) => {
-    adminService.postCategories(req, res, (data) => {
+    categoryService.postCategories(req, res, (data) => {
       if (data.status === 'error') {
         req.flash('error_msg', data.message)
         return res.redirect('back')
@@ -123,7 +124,7 @@ const adminController = {
   },
   // 編輯分類
   putCategory: async (req, res) => {
-    adminService.putCategory(req, res, (data) => {
+    categoryService.putCategory(req, res, (data) => {
       if (data.status === 'error') {
         req.flash('error_msg', data.message)
         return res.redirect('back')
@@ -134,7 +135,7 @@ const adminController = {
   },
   // 刪除分類
   deleteCategory: async (req, res) => {
-    adminService.deleteCategory(req, res, (data) => {
+    categoryService.deleteCategory(req, res, (data) => {
       if (data.status === 'error') {
         req.flash('error_msg', data.message)
         return res.redirect('back')

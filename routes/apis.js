@@ -17,6 +17,7 @@ const authenticatedAdmin = (req, res, next) => {
 
 const adminController = require('../controllers/api/adminController')
 const userController = require('../controllers/api/userController')
+const categoryController = require('../controllers/api/categoryController')
 
 // admin/restaurants
 router.get('/admin/restaurants', authenticated, authenticatedAdmin, adminController.getRestaurants)
@@ -26,10 +27,10 @@ router.put('/admin/restaurants/:id', authenticated, authenticatedAdmin, upload.s
 router.delete('/admin/restaurants/:id', authenticated, authenticatedAdmin, adminController.deleteRestaurant)
 
 // admin/categories
-router.get('/admin/categories', authenticated, authenticatedAdmin, adminController.getCategories)
-router.post('/admin/categories', authenticated, authenticatedAdmin, adminController.postCategories)
-router.put('/admin/categories/:id', authenticated, authenticatedAdmin, adminController.putCategory)
-router.delete('/admin/categories/:id', authenticated, authenticatedAdmin, adminController.deleteCategory)
+router.get('/admin/categories', authenticated, authenticatedAdmin, categoryController.getCategories)
+router.post('/admin/categories', authenticated, authenticatedAdmin, categoryController.postCategories)
+router.put('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.putCategory)
+router.delete('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.deleteCategory)
 
 // JWT signin
 router.post('/signin', userController.signIn)

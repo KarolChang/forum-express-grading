@@ -73,7 +73,7 @@ const userController = {
     try {
       const id = Number(req.params.id)
       const userId = helpers.getUser(req).id
-      // Promise.all() 
+      // Promise.all()
       const [userNow, userSearch, commentsInDb] = await Promise.all(
         [
           User.findByPk(userId, {
