@@ -73,26 +73,30 @@ const userController = {
     try {
       const id = Number(req.params.id)
       const userId = helpers.getUser(req).id
-      const userNow = await User.findByPk(userId, {
-        include: [
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' }
+      // Promise.all() 
+      const [userNow, userSearch, commentsInDb] = await Promise.all(
+        [
+          User.findByPk(userId, {
+            include: [
+              { model: User, as: 'Followers' },
+              { model: User, as: 'Followings' }
+            ]
+          }),
+          User.findByPk(id, {
+            include: [
+              { model: Restaurant, as: 'FavoritedRestaurants' },
+              { model: User, as: 'Followers' },
+              { model: User, as: 'Followings' }
+            ]
+          }),
+          Comment.findAll({
+            raw: true,
+            nest: true,
+            where: { userId: id },
+            include: { model: Restaurant }
+          })
         ]
-      })
-      const userSearch = await User.findByPk(id, {
-        include: [
-          { model: Restaurant, as: 'FavoritedRestaurants' },
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' }
-        ]
-      })
-      const isFollowed = userNow.Followings.map(d => d.id).includes(id)
-      const commentsInDb = await Comment.findAll({
-        raw: true,
-        nest: true,
-        where: { userId: id },
-        include: { model: Restaurant }
-      })
+      )
       // 篩選重覆評論，列出不重複餐廳
       const comments = []
       commentsInDb.forEach(comment => {
@@ -100,6 +104,7 @@ const userController = {
           comments.push(comment)
         }
       })
+      const isFollowed = userNow.Followings.map(d => d.id).includes(id)
       return res.render('user', {
         userNow: userNow.toJSON(),
         userSearch: userSearch.toJSON(),
