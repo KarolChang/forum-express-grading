@@ -30,6 +30,12 @@ const adminController = {
     adminService.putRestaurant(req, res, (data) => {
       return res.json(data)
     })
+  },
+  // 瀏覽使用者列表
+  getUsers: (req, res) => {
+    adminService.getUsers(req, res, (data) => {
+      return res.json(data)
+    })
   }
 }
 

@@ -1,6 +1,7 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
 const Category = db.Category
+const User = db.User
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const defaultImg = 'https://www.phoca.cz/images/projects/phoca-restaurant-menu-r.png'
@@ -87,6 +88,14 @@ const adminService = {
       restaurant.destroy()
     })
       .then(() => callback({ status: 'success', message: '餐廳已刪除!' }))
+      .catch(err => console.log(err))
+  },
+  // 瀏覽使用者列表
+  getUsers: (req, res, callback) => {
+    return User.findAll({ raw: true, nest: true })
+      .then(users => {
+        callback({ users })
+      })
       .catch(err => console.log(err))
   }
 }
