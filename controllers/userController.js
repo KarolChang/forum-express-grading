@@ -142,36 +142,6 @@ const userController = {
       req.flash('success_msg', data.message)
       return res.redirect('back')
     })
-  },
-  // 人氣餐廳頁面
-  getTopRestaurant: async (req, res, next) => {
-    try {
-      const topNumber = 10
-      const UserId = helpers.getUser(req).id
-      let restaurants = await Restaurant.findAll({
-        include: { model: User, as: 'FavoritedUsers' },
-        attributes: {
-          include: [
-            [
-              sequelize.literal('(SELECT COUNT(*) FROM Favorites WHERE Favorites.RestaurantId = Restaurant.id GROUP BY favorites.RestaurantId)'), 'favoriteCount'
-            ]
-          ]
-        },
-        order: [[sequelize.literal('favoriteCount'), 'DESC']],
-        limit: 10
-      })
-      restaurants = restaurants.map(r => ({
-        ...r.dataValues,
-        description: r.dataValues.description.substring(0, 20),
-        favoriteCount: r.FavoritedUsers.length,
-        isFavorited: r.FavoritedUsers.map(d => d.id).includes(UserId)
-      }))
-      restaurants = restaurants.sort((a, b) => b.favoriteCount - a.favoriteCount)
-      restaurants = restaurants.slice(0, topNumber)
-      return res.render('topRestaurant', { restaurants })
-    } catch (err) {
-      next(err)
-    }
   }
 }
 

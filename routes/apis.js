@@ -18,6 +18,7 @@ const authenticatedAdmin = (req, res, next) => {
 const adminController = require('../controllers/api/adminController')
 const userController = require('../controllers/api/userController')
 const categoryController = require('../controllers/api/categoryController')
+const restController = require('../controllers/api/restController')
 
 // /admin
 router.get('/admin', authenticated, authenticatedAdmin, (req, res) => res.redirect('/api/admin/restaurants'))
@@ -59,5 +60,13 @@ router.delete('/like/:restaurantId', authenticated, userController.removeLike)
 // /following
 router.post('/following/:userId', authenticated, userController.addFollowing)
 router.delete('/following/:userId', authenticated, userController.removeFollowing)
+
+// rest
+router.get('/', authenticated, (req, res) => res.redirect('/restaurants'))
+router.get('/restaurants', authenticated, restController.getRestaurants)
+router.get('/restaurants/:id', authenticated, restController.getRestaurant)
+router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
+router.get('/restaurants/feeds', authenticated, restController.getFeeds)
+router.get('/restaurants/top', authenticated, restController.getTopRestaurant)
 
 module.exports = router
