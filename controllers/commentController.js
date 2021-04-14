@@ -1,31 +1,30 @@
 const db = require('../models')
 const Comment = db.Comment
 
+const commentService = require('../services/commentService')
+
 const commentController = {
   // 新增評論
-  postComment: async (req, res) => {
-    try {
-      if (req.body.text) {
-        await Comment.create({
-          text: req.body.text,
-          UserId: req.user.id,
-          RestaurantId: req.body.restaurantId
-        })
+  postComment: (req, res) => {
+    commentService.postComment(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_msg', data.message)
+        return res.redirect(`/restaurants/${data.restaurantId}`)
       }
-      return res.redirect(`/restaurants/${req.body.restaurantId}`)
-    } catch (err) {
-      console.warn(err)
-    }
+      req.flash('success_msg', data.message)
+      return res.redirect(`/restaurants/${data.restaurantId}`)
+    })
   },
   // 刪除評論 (只有 admin 可以)
-  deleteComment: async (req, res) => {
-    try {
-      const comment = await Comment.findByPk(req.params.id)
-      await comment.destroy()
-      return res.redirect(`/restaurants/${comment.RestaurantId}`)
-    } catch (err) {
-      console.warn(err)
-    }
+  deleteComment: (req, res) => {
+    commentService.deleteComment(req, res, (data) => {
+      if (data.status === 'error') {
+        req.flash('error_msg', data.message)
+        return res.redirect(`/restaurants/${data.RestaurantId}`)
+      }
+      req.flash('success_msg', data.message)
+      return res.redirect(`/restaurants/${data.RestaurantId}`)
+    })
   }
 }
 

@@ -19,6 +19,7 @@ const adminController = require('../controllers/api/adminController')
 const userController = require('../controllers/api/userController')
 const categoryController = require('../controllers/api/categoryController')
 const restController = require('../controllers/api/restController')
+const commentController = require('../controllers/api/commentController')
 
 // /admin
 router.get('/admin', authenticated, authenticatedAdmin, (req, res) => res.redirect('/api/admin/restaurants'))
@@ -68,5 +69,9 @@ router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 router.get('/restaurants/feeds', authenticated, restController.getFeeds)
 router.get('/restaurants/top', authenticated, restController.getTopRestaurant)
+
+// /comments
+router.post('/comments', authenticated, commentController.postComment)
+router.delete('/comments/:id', authenticated, authenticatedAdmin, commentController.deleteComment)
 
 module.exports = router

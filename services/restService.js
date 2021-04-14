@@ -3,7 +3,6 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 const Comment = db.Comment
 const User = db.User
-const Favorite = db.Favorite
 const pageLimit = 10
 const helpers = require('../_helpers')
 const sequelize = require('sequelize')
@@ -38,7 +37,6 @@ const restController = {
         isLiked: req.user.LikedRestaurants.map(d => d.id).includes(r.id)
       }))
       const categories = await Category.findAll({ raw: true, nest: true })
-      // return res.render('restaurants', { restaurants: data, categories, categoryId, page, pages, totalPage, prev, next })
       callback({ restaurants: data, categories, categoryId, page, pages, totalPage, prev, next })
     } catch (err) {
       console.warn(err)
